@@ -67,10 +67,24 @@ def get_prompt(prompt_id: str):
     # BUG #1: This will raise a 500 error if prompt doesn't exist
     # because we're accessing .id on None
     # Should return 404 instead!
+    """
+    Retrieve a prompt by its ID.
+
+    Args:
+        prompt_id (str): The ID of the prompt to retrieve.
+
+    Returns:
+        Prompt: The prompt object if found.
+
+    Raises:
+        HTTPException: If the prompt is not found, raises a 404 error.
+    """
     prompt = storage.get_prompt(prompt_id)
     
-    # This line causes the bug - accessing attribute on None
-    if prompt.id:
+    # Check if prompt is None and raise a 404 error if so
+    if prompt is None:
+        raise HTTPException(status_code=404, detail="Prompt not found")
+
         return prompt
 
 
@@ -107,7 +121,7 @@ def update_prompt(prompt_id: str, prompt_data: PromptUpdate):
         description=prompt_data.description,
         collection_id=prompt_data.collection_id,
         created_at=existing.created_at,
-        updated_at=existing.updated_at  # BUG: Should be get_current_time()
+        updated_at=get_current_time()  # Updated to use the current time
     )
     
     return storage.update_prompt(prompt_id, updated_prompt)
@@ -158,3 +172,4 @@ def delete_collection(collection_id: str):
     # Missing: Handle prompts that belong to this collection!
     
     return None
+
