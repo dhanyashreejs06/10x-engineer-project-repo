@@ -85,7 +85,7 @@ def get_prompt(prompt_id: str):
     if prompt is None:
         raise HTTPException(status_code=404, detail="Prompt not found")
 
-        return prompt
+    return prompt
 
 
 @app.post("/prompts", response_model=Prompt, status_code=201)
@@ -203,14 +203,29 @@ def create_collection(collection_data: CollectionCreate):
 
 @app.delete("/collections/{collection_id}", status_code=204)
 def delete_collection(collection_id: str):
-    # BUG #4: We delete the collection but don't handle the prompts!
-    # Prompts with this collection_id become orphaned with invalid reference
-    # Should either: delete the prompts, set collection_id to None, or prevent deletion
-    
-    if not storage.delete_collection(collection_id):
+    """
+    Delete a collection by its ID and handle related prompts.
+
+    Args:
+        collection_id (str): The ID of the collection to delete.
+
+    Returns:
+        None
+
+    Raises:
+        HTTPException: If the collection is not found, raises a 404 error.
+    """
+    # Retrieve the collection to ensure it exists
+    if not storage.get_collection(collection_id):
         raise HTTPException(status_code=404, detail="Collection not found")
     
-    # Missing: Handle prompts that belong to this collection!
-    
-    return None
+    # Get all prompts and delete those with the specified collection_id
+    prompts = storage.get_all_prompts()
+    for prompt in prompts:
+        if prompt.collection_id == collection_id:
+            storage.delete_prompt(prompt.id)
 
+    # Delete the collection after its prompts are handled
+    storage.delete_collection(collection_id)
+
+    return None
