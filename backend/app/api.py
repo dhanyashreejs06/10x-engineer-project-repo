@@ -130,6 +130,8 @@ def update_prompt(prompt_id: str, prompt_data: PromptUpdate):
 # NOTE: PATCH endpoint is missing! Students need to implement this.
 # It should allow partial updates (only update provided fields)
 
+#PATCH endpoint - WITH Partial update works ,Timestamp updates ,Error handling   
+
 @app.patch("/prompts/{prompt_id}", response_model=Prompt)
 def patch_prompt(prompt_id: str, prompt_data: PromptPatch):
     """
