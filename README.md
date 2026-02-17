@@ -1,167 +1,125 @@
 # PromptLab
 
-**Your AI Prompt Engineering Platform**
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.68.0-lightgreen)
 
----
+## Overview
 
-## Welcome to the Team! 👋
+PromptLab is an AI Prompt Engineering Platform designed to help AI engineers store, organize, and manage their prompts efficiently. It's like a "Postman for Prompts," providing a structured workspace to:
 
-Congratulations on joining the PromptLab engineering team! You've been brought on to help us build the next generation of prompt engineering tools.
+- Create, Read, Update, and Delete (CRUD) prompt templates.
+- Organize prompts into collections.
+- Search, filter, and sort through prompts with ease.
 
-### What is PromptLab?
+## Features
 
-PromptLab is an internal tool for AI engineers to **store, organize, and manage their prompts**. Think of it as a "Postman for Prompts" — a professional workspace where teams can:
+- **CRUD operations** for managing prompts and collections.
+- Easy **search, filter, and sorting** functionalities.
 
-- 📝 Store prompt templates with variables (`{{input}}`, `{{context}}`)
-- 📁 Organize prompts into collections
-- 🏷️ Tag and search prompts
-- 📜 Track version history
-- 🧪 Test prompts with sample inputs
-
-### The Current Situation
-
-The previous developer left us with a *partially working* backend. The core structure is there, but:
-
-- There are **several bugs** that need fixing
-- Some **features are incomplete**
-- The **documentation is minimal** (you'll fix that)
-- There are **no tests** worth mentioning
-- **No CI/CD pipeline** exists
-- **No frontend** has been built yet
-
-Your job over the next 4 weeks is to transform this into a **production-ready, full-stack application**.
-
----
-
-## Quick Start
-
-### Prerequisites
+## Prerequisites
 
 - Python 3.10+
-- Node.js 18+ (for Week 4)
-- Git
+- pip
 
-### Run Locally
+## Installation
 
-```bash
-# Clone the repo
-git clone <your-repo-url>
-cd promptlab
+1. **Clone the repo:**
+   ```bash
+   git clone <your-repo-url>
+   cd promptlab
+   ```
 
-# Set up backend
-cd backend
-pip install -r requirements.txt
-python main.py
-```
+2. **Navigate to the backend directory and set up the environment:**
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   ```
 
-API runs at: http://localhost:8000
+3. **Run the application:**
+   ```bash
+   python main.py
+   ```
 
-API docs at: http://localhost:8000/docs
+The API runs at: http://localhost:8000
+API documentation is available at: http://localhost:8000/docs
 
-### Run Tests
+## Quick Start Guide
+
+To interact with the API, you can use `curl` commands. Here are some examples:
+
+- **Check health:**
+  ```bash
+  curl -X GET http://localhost:8000/health
+  ```
+
+- **Get all prompts:**
+  ```bash
+  curl -X GET http://localhost:8000/prompts
+  ```
+
+- **Create a new prompt:**
+  ```bash
+  curl -X POST http://localhost:8000/prompts -H "Content-Type: application/json" -d '{"title": "New Prompt", "content": "Prompt content here"}'
+  ```
+
+## API Endpoint Summary
+
+| Method | Path                 | Description           |
+|--------|----------------------|-----------------------|
+| GET    | `/health`            | Health check endpoint |
+| GET    | `/prompts`           | Retrieve all prompts  |
+| GET    | `/prompts/{id}`      | Retrieve a specific prompt by ID |
+| POST   | `/prompts`           | Create a new prompt   |
+| PUT    | `/prompts/{id}`      | Update an existing prompt by ID |
+| PATCH  | `/prompts/{id}`      | Partially update a prompt by ID |
+| DELETE | `/prompts/{id}`      | Delete a specific prompt by ID |
+| GET    | `/collections`       | Retrieve all collections |
+| GET    | `/collections/{id}`  | Retrieve a specific collection by ID |
+| POST   | `/collections`       | Create a new collection |
+| DELETE | `/collections/{id}`  | Delete a specific collection by ID |
+
+## Development Setup
+
+To set up a development environment, follow these steps:
+
+1. Ensure you have Python 3.10+ installed.
+2. Clone the repository and navigate to the `backend` directory.
+3. Install required dependencies with `pip install -r requirements.txt`.
+
+## Running Tests
+
+Execute the following command to run tests:
 
 ```bash
 cd backend
 pytest tests/ -v
 ```
 
----
-
 ## Project Structure
 
 ```
 promptlab/
-├── README.md                    # You are here
-├── PROJECT_BRIEF.md             # Your assignment details
-├── GRADING_RUBRIC.md            # How you'll be graded
-│
+├── README.md                    # Project documentation
 ├── backend/
 │   ├── app/
-│   │   ├── __init__.py
-│   │   ├── api.py              # FastAPI routes (has bugs!)
-│   │   ├── models.py           # Pydantic models
-│   │   ├── storage.py          # In-memory storage
-│   │   └── utils.py            # Helper functions
+│   │   ├── api.py              # API routes
+│   │   ├── models.py           # Data models
+│   │   ├── storage.py          # Storage logic
+│   │   └── utils.py            # Utility functions
 │   ├── tests/
-│   │   ├── __init__.py
-│   │   ├── test_api.py         # Basic tests
-│   │   └── conftest.py         # Test fixtures
-│   ├── main.py                 # Entry point
-│   └── requirements.txt
-│
-├── frontend/                    # You'll create this in Week 4
-├── specs/                       # You'll create this in Week 2
-├── docs/                        # You'll create this in Week 2
-└── .github/                     # You'll set up CI/CD in Week 3
+│   │   └── test_api.py         # Test cases
+│   └── main.py                 # Application entry point
+└── requirements.txt            # Dependency list
 ```
 
----
+## Contributing
 
-## Your Mission
+We welcome contributions from the community! Please follow these guidelines:
 
-### 🧪 Experimentation Encouraged!
-While we provide guidelines, **you are the engineer**. If you see a better way to solve a problem using AI, do it!
-- Want to swap the storage layer for a real database? **Go for it.**
-- Want to add Authentication? **Do it.**
-- Want to rewrite the API in a different style? **As long as tests pass, you're clear.**
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix.
+3. Submit a pull request with a clear description of your changes.
 
-The goal is to learn how to build *better* software *faster* with AI. Don't be afraid to break things and rebuild them better.
+### Summary
 
-### Week 1: Fix the Backend
-- Understand this codebase using AI
-- Find and fix the bugs
-- Implement missing features
-
-### Week 2: Document Everything
-- Write proper documentation
-- Create feature specifications
-- Set up coding standards
-
-### Week 3: Make it Production-Ready
-- Write comprehensive tests
-- Implement new features with TDD
-- Set up CI/CD and Docker
-
-### Week 4: Build the Frontend
-- Create a React frontend
-- Connect it to the backend
-- Polish the user experience
-
----
-
-## API Endpoints (Current)
-
-| Method | Endpoint | Description | Status |
-|--------|----------|-------------|--------|
-| GET | `/health` | Health check | ✅ Works |
-| GET | `/prompts` | List all prompts | ⚠️ Has issues |
-| GET | `/prompts/{id}` | Get single prompt | ❌ Bug |
-| POST | `/prompts` | Create prompt | ✅ Works |
-| PUT | `/prompts/{id}` | Update prompt | ⚠️ Has issues |
-| DELETE | `/prompts/{id}` | Delete prompt | ✅ Works |
-| GET | `/collections` | List collections | ✅ Works |
-| GET | `/collections/{id}` | Get collection | ✅ Works |
-| POST | `/collections` | Create collection | ✅ Works |
-| DELETE | `/collections/{id}` | Delete collection | ❌ Bug |
-
----
-
-## Tech Stack
-
-- **Backend**: Python 3.10+, FastAPI, Pydantic
-- **Frontend**: React, Vite (Week 4)
-- **Testing**: pytest
-- **DevOps**: Docker, GitHub Actions (Week 3)
-
----
-
-## Need Help?
-
-1. **Use AI tools** — This is an AI-assisted coding course!
-2. Read the `PROJECT_BRIEF.md` for detailed instructions
-3. Check `GRADING_RUBRIC.md` to understand expectations
-4. Ask questions in the course forum
-
----
-
-Good luck, and welcome to the team! 🚀
+PromptLab is designed to streamline prompt management with features like CRUD operations, collections, and robust search & filter capabilities. It's built with Python and FastAPI, ensuring a modern and efficient tech stack. Join us in enhancing PromptLab by contributing your expertise!
