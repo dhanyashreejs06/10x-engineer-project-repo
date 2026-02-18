@@ -52,6 +52,19 @@ def get_prompt(prompt_id: str) -> Optional[Prompt]:
 - Descriptive variable names (no single letters except loops)
 - List comprehensions when readable
 
+-Always mention the programming language and file name in the info string of every code block.
+-If a code block is longer than 20 lines, replace unchanged sections with short, language-appropriate placeholders.
+-Use code blocks only when suggesting or demonstrating code.
+-Describe what the code does before explaining how it works.
+-Start with simple explanations, then add more technical details.
+-Explain any technical terms the first time they are used.
+-Include examples whenever they help understanding.
+-If the code is part of a process, explain the workflow step by step.
+-Focus on clarity and understanding rather than clever or complex solutions.
+-Format documentation in Markdown using headings, bullet points, and code blocks.
+
+
+
 ## ARCHITECTURAL RULES
 
 ### Separation of Concerns
