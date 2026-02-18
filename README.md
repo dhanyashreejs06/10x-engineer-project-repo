@@ -3,123 +3,146 @@
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.68.0-lightgreen)
 
-## Overview
+## Project Overview and Purpose
 
-PromptLab is an AI Prompt Engineering Platform designed to help AI engineers store, organize, and manage their prompts efficiently. It's like a "Postman for Prompts," providing a structured workspace to:
+PromptLab is a comprehensive AI Prompt Engineering Platform designed to assist AI engineers in storing, organizing, and managing their prompts efficiently. It offers a structured workspace similar to "Postman for Prompts" with features to manage different versions and associated metadata.
 
-- Create, Read, Update, and Delete (CRUD) prompt templates.
-- Organize prompts into collections.
-- Search, filter, and sort through prompts with ease.
+## Features List
 
-## Features
+- **Prompt Management API Endpoints**:
+  - ✅ Create, read, update, and delete prompts
+  - 📋 Support for hierarchical prompt organization in future iterations
+  - ✅ In-memory storage, with plans for database integration
 
-- **CRUD operations** for managing prompts and collections.
-- Easy **search, filter, and sorting** functionalities.
+## Prerequisites and Installation
 
-## Prerequisites
+Ensure you have Python 3.10+ installed. Set up the project using the following commands:
 
-- Python 3.10+
-- pip
-
-## Installation
-
-1. **Clone the repo:**
-   ```bash
-   git clone <your-repo-url>
-   cd promptlab
-   ```
-
-2. **Navigate to the backend directory and set up the environment:**
-   ```bash
-   cd backend
-   pip install -r requirements.txt
-   ```
-
-3. **Run the application:**
-   ```bash
-   python main.py
-   ```
-
-The API runs at: http://localhost:8000
-API documentation is available at: http://localhost:8000/docs
+```bash
+git clone <your-repo-url>
+cd promptlab
+python -m venv venv
+source venv/bin/activate
+cd backend
+pip install -r requirements.txt
+```
 
 ## Quick Start Guide
 
-To interact with the API, you can use `curl` commands. Here are some examples:
+To run the server:
 
-- **Check health:**
-  ```bash
-  curl -X GET http://localhost:8000/health
-  ```
+```bash
+cd backend
+python main.py
+# Open http://localhost:8000 in your browser
+```
 
-- **Get all prompts:**
-  ```bash
-  curl -X GET http://localhost:8000/prompts
-  ```
+## API Endpoint Summary with Examples
 
-- **Create a new prompt:**
-  ```bash
-  curl -X POST http://localhost:8000/prompts -H "Content-Type: application/json" -d '{"title": "New Prompt", "content": "Prompt content here"}'
-  ```
-
-## API Endpoint Summary
-
-| Method | Path                 | Description           |
-|--------|----------------------|-----------------------|
-| GET    | `/health`            | Health check endpoint |
-| GET    | `/prompts`           | Retrieve all prompts  |
-| GET    | `/prompts/{id}`      | Retrieve a specific prompt by ID |
-| POST   | `/prompts`           | Create a new prompt   |
-| PUT    | `/prompts/{id}`      | Update an existing prompt by ID |
-| PATCH  | `/prompts/{id}`      | Partially update a prompt by ID |
-| DELETE | `/prompts/{id}`      | Delete a specific prompt by ID |
-| GET    | `/collections`       | Retrieve all collections |
-| GET    | `/collections/{id}`  | Retrieve a specific collection by ID |
-| POST   | `/collections`       | Create a new collection |
-| DELETE | `/collections/{id}`  | Delete a specific collection by ID |
+| Method | Path                                | Description                              | Example Command                                                    |
+|--------|-------------------------------------|------------------------------------------|-------------------------------------------------------------------|
+| GET    | `/health`                           | Health check endpoint                    | `curl -X GET http://localhost:8000/health`                         |
+| GET    | `/prompts`                          | Retrieve all prompts                     | `curl -X GET http://localhost:8000/prompts`                        |
+| GET    | `/prompts/{prompt_id}`              | Retrieve a specific prompt by ID         | `curl -X GET http://localhost:8000/prompts/1`                      |
+| POST   | `/prompts`                          | Create a new prompt                      | `curl -X POST -d '{\"title\": \"New Prompt\"}' http://localhost:8000/prompts` |
+| PUT    | `/prompts/{prompt_id}`              | Update an existing prompt by ID          | `curl -X PUT -d '{\"title\": \"Updated\"}' http://localhost:8000/prompts/1`  |
+| PATCH  | `/prompts/{prompt_id}`              | Partially update a prompt by ID          | `curl -X PATCH ...` (Replace with appropriate data)                |
+| DELETE | `/prompts/{prompt_id}`              | Delete a specific prompt by ID           | `curl -X DELETE http://localhost:8000/prompts/1`                   |
+| GET    | `/collections`                      | Retrieve all collections                 | `curl -X GET http://localhost:8000/collections`                    |
+| GET    | `/collections/{collection_id}`      | Retrieve a specific collection by ID     | `curl -X GET http://localhost:8000/collections/1`                  |
+| POST   | `/collections`                      | Create a new collection                  | `curl -X POST -d '{\"name\": \"New Collection\"}' http://localhost:8000/collections` |
+| DELETE | `/collections/{collection_id}`      | Delete a specific collection by ID       | `curl -X DELETE http://localhost:8000/collections/1`               |
 
 ## Development Setup
 
-To set up a development environment, follow these steps:
+To set up a development environment:
 
-1. Ensure you have Python 3.10+ installed.
+1. Ensure Python 3.10+ is installed.
 2. Clone the repository and navigate to the `backend` directory.
-3. Install required dependencies with `pip install -r requirements.txt`.
+3. Install the required packages using `pip install -r requirements.txt`.
 
 ## Running Tests
 
-Execute the following command to run tests:
+Run tests using:
 
 ```bash
 cd backend
 pytest tests/ -v
+pytest tests/ --cov=app
 ```
 
 ## Project Structure
 
 ```
 promptlab/
-├── README.md                    # Project documentation
+├── README.md                  # Project documentation
+├── .continue/                 # AI prompt continuation files
+│   ├── rules/                 # Custom coding instructions
+│   │   └── custom-coding-instructions.md
+│   └── prompts/               # Prompt creation guidelines
+│       ├── create-api-docs.md
+│       ├── add-docstrings.md
+│       └── create-feature-spec.md
+├── .devcontainer/             # VSCode dev container configuration
+│   ├── setup.sh
+│   └── devcontainer.json
 ├── backend/
-│   ├── app/
-│   │   ├── api.py              # API routes
-│   │   ├── models.py           # Data models
-│   │   ├── storage.py          # Storage logic
-│   │   └── utils.py            # Utility functions
-│   ├── tests/
-│   │   └── test_api.py         # Test cases
-│   └── main.py                 # Application entry point
-└── requirements.txt            # Dependency list
+│   ├── app/                   # Core backend application
+│   │   ├── __init__.py        # Initialization script for package
+│   │   ├── api.py             # API endpoints for FastAPI
+│   │   ├── models.py          # Pydantic models for data validation
+│   │   ├── storage.py         # In-memory data storage logic
+│   │   └── utils.py           # Utility functions and business logic
+│   ├── main.py                # Main application entry point
+│   ├── requirements.txt       # Dependencies and package requirements
+│   ├── tests/                 # Unit and integration tests
+│   │   ├── __init__.py        # Initialization for tests package
+│   │   ├── conftest.py        # Fixtures and test setup
+│   │   └── test_api.py        # Test cases for API endpoints
+│   └── .pytest_cache/         # Cache directory for pytest
+├── docs/
+│   ├── .gitkeep               # Placeholder for version control
+│   └── API_REFERENCE.md       # Detailed breakdown of API
+├── frontend/
+│   └── .gitkeep               # Placeholder for future frontend
+├── specs/                     # Specifications and technical requirements
+│   ├── .gitkeep               # Placeholder for version control
+│   ├── prompt-versions.md     # Document on prompt versions
+│   └── tagging-system.md      # Document on tagging system
+└── PROJECT_BRIEF.md           # Brief of the project requirements
 ```
 
-## Contributing
+## Documentation Links
 
-We welcome contributions from the community! Please follow these guidelines:
+- [API Reference](docs/API_REFERENCE.md)
+- [Prompt Versions Specification](specs/prompt-versions.md)
+- [Tagging System Specification](specs/tagging-system.md)
+
+## Roadmap
+
+- **Near-Term Goals**:
+  - Implement a system for hierarchical prompt organization.
+  - Transition storage from in-memory to a robust database solution.
+  - Write comprehensive tests.  <!-- New addition -->
+  - Implement new features with TDD.  <!-- New addition -->
+  - Set up CI/CD and Docker.  <!-- New addition -->
+
+- **Long-Term Aspirations**:
+  - Develop a user-friendly, comprehensive frontend interface.
+  - Integrate real-time prompt evaluation with AI models to enhance development feedback.
+  - Expand user roles and permissions for better collaboration.
+  - Create a React frontend.  <!-- New addition -->
+  - Connect it to the backend.  <!-- New addition -->
+  - Polish the user experience.  <!-- New addition -->
+
+## Contributing Guidelines
+
+To contribute to PromptLab:
 
 1. Fork the repository.
-2. Create a new branch for your feature or bugfix.
-3. Submit a pull request with a clear description of your changes.
+2. Create a new branch for a feature or bugfix.
+3. Submit a pull request with a clear description and documentation of your changes.
 
 ### Summary
 
-PromptLab is designed to streamline prompt management with features like CRUD operations, collections, and robust search & filter capabilities. It's built with Python and FastAPI, ensuring a modern and efficient tech stack. Join us in enhancing PromptLab by contributing your expertise!
+PromptLab streamlines prompt management with CRUD operations, collection management, and search capabilities, ensuring a sound and modern tech stack with Python and FastAPI. We welcome contributions to further enhance its capabilities.
