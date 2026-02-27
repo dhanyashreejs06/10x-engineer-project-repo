@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  # Our FastAPI backend service
+  backend:
+    # Build using the Dockerfile inside ./backend folder
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    # Name of the running container
+    container_name: promptlab-backend
+
+    # Map port 8000 on your machine to port 8000 inside container
+    # Format: "your-machine:container"
+    ports:
+      - "8000:8000"
+
+    # Sync local code with container so changes reflect without rebuild
+    # Format: "local-folder:container-folder"
+    volumes:
+      - ./backend:/app
+
+    # Environment variables inside the container
+    environment:
+      - PYTHONUNBUFFERED=1  # Python prints logs immediately
+
+    # Auto-restart if container crashes
+    restart: unless-stopped
