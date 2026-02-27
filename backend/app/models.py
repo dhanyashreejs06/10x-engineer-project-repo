@@ -1,5 +1,3 @@
-
-
 from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, Field
@@ -34,11 +32,13 @@ class PromptBase(BaseModel):
         content (str): The content of the prompt with no maximum length.
         description (Optional[str]): An optional description of the prompt with a maximum length of 500.
         collection_id (Optional[str]): The ID of the associated collection.
+        tags (List[str]): A list of string tags for categorizing the prompt.
     """
     title: str = Field(..., min_length=1, max_length=200)
     content: str = Field(..., min_length=1)
     description: Optional[str] = Field(None, max_length=500)
     collection_id: Optional[str] = None
+    tags: List[str] = Field(default_factory=list)
 
 
 class PromptCreate(PromptBase):
@@ -64,6 +64,7 @@ class PromptPatch(BaseModel):
     content: Optional[str] = Field(None, min_length=1)
     description: Optional[str] = Field(None, max_length=500)
     collection_id: Optional[str] = None
+    tags: Optional[List[str]] = None
 
 
 class Prompt(PromptBase):

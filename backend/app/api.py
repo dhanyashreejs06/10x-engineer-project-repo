@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 
 from app.models import (
-    Prompt, PromptCreate, PromptUpdate,PromptPatch,
+    Prompt, PromptCreate, PromptUpdate, PromptPatch,
     Collection, CollectionCreate,
     PromptList, CollectionList, HealthResponse,
     get_current_time
@@ -32,6 +32,7 @@ app.add_middleware(
 
 
 # ============== Health Check ==============
+
 @app.get("/health", response_model=HealthResponse)
 def health_check():
     """Check the health status of the application.
@@ -51,46 +52,47 @@ def health_check():
 @app.get("/prompts", response_model=PromptList)
 def list_prompts(
     collection_id: Optional[str] = None,
-    search: Optional[str] = None
+    search: Optional[str] = None,
+    tag: Optional[str] = None
 ):
-    """Retrieve a list of prompts, optionally filtering by collection ID and search query.
+    """Retrieve a list of prompts, optionally filtering by collection ID, search query, and tag.
 
     Args:
         collection_id (Optional[str]): The ID of the collection to filter prompts. Defaults to None.
         search (Optional[str]): A search term to filter the prompt list. Defaults to None.
+        tag (Optional[str]): A tag to filter the prompt list. Defaults to None.
 
     Returns:
         PromptList: A list of prompts with the total count.
 
     Example:
-        >>> prompts = list_prompts(collection_id="123", search="greeting")
+        >>> prompts = list_prompts(collection_id="123", search="greeting", tag="python")
         >>> for prompt in prompts.prompts:
         ...     print(prompt.title)
     """
     prompts = storage.get_all_prompts()
-    
+
     # Filter by collection if specified
     if collection_id:
         prompts = filter_prompts_by_collection(prompts, collection_id)
-    
+
     # Search if query provided
     if search:
         prompts = search_prompts(prompts, search)
-    
+
+    # Filter by tag if specified
+    if tag:
+        prompts = [p for p in prompts if tag in p.tags]
+
     # Sort by date (newest first)
-    # Note: There might be an issue with the sorting...
     prompts = sort_prompts_by_date(prompts, descending=True)
-    
+
     return PromptList(prompts=prompts, total=len(prompts))
 
 
 @app.get("/prompts/{prompt_id}", response_model=Prompt)
 def get_prompt(prompt_id: str):
-    # BUG #1: This will raise a 500 error if prompt doesn't exist
-    # because we're accessing .id on None
-    # Should return 404 instead!
-    """
-    Retrieve a prompt by its ID.
+    """Retrieve a prompt by its ID.
 
     Args:
         prompt_id (str): The ID of the prompt to retrieve.
@@ -102,8 +104,7 @@ def get_prompt(prompt_id: str):
         HTTPException: If the prompt is not found, raises a 404 error.
     """
     prompt = storage.get_prompt(prompt_id)
-    
-    # Check if prompt is None and raise a 404 error if so
+
     if prompt is None:
         raise HTTPException(status_code=404, detail="Prompt not found")
 
@@ -133,7 +134,7 @@ def create_prompt(prompt_data: PromptCreate):
         collection = storage.get_collection(prompt_data.collection_id)
         if not collection:
             raise HTTPException(status_code=400, detail="Collection not found")
-    
+
     prompt = Prompt(**prompt_data.model_dump())
     return storage.create_prompt(prompt)
 
@@ -160,37 +161,30 @@ def update_prompt(prompt_id: str, prompt_data: PromptUpdate):
     existing = storage.get_prompt(prompt_id)
     if not existing:
         raise HTTPException(status_code=404, detail="Prompt not found")
-    
+
     # Validate collection if provided
     if prompt_data.collection_id:
         collection = storage.get_collection(prompt_data.collection_id)
         if not collection:
             raise HTTPException(status_code=400, detail="Collection not found")
-    
-    # BUG #2: We're not updating the updated_at timestamp!
-    # The updated prompt keeps the old timestamp
+
     updated_prompt = Prompt(
         id=existing.id,
         title=prompt_data.title,
         content=prompt_data.content,
         description=prompt_data.description,
         collection_id=prompt_data.collection_id,
+        tags=prompt_data.tags,
         created_at=existing.created_at,
-        updated_at=get_current_time()  # Updated to use the current time
+        updated_at=get_current_time()
     )
-    
+
     return storage.update_prompt(prompt_id, updated_prompt)
 
 
-# NOTE: PATCH endpoint is missing! Students need to implement this.
-# It should allow partial updates (only update provided fields)
-
-#PATCH endpoint - WITH Partial update works ,Timestamp updates ,Error handling   
-
 @app.patch("/prompts/{prompt_id}", response_model=Prompt)
 def patch_prompt(prompt_id: str, prompt_data: PromptPatch):
-    """
-    Partially update a prompt by its ID.
+    """Partially update a prompt by its ID.
 
     Args:
         prompt_id (str): The ID of the prompt to update.
@@ -206,26 +200,27 @@ def patch_prompt(prompt_id: str, prompt_data: PromptPatch):
     if not existing:
         raise HTTPException(status_code=404, detail="Prompt not found")
 
-    # Extract updates from provided data only using model_dump
+    # Extract only the fields that were actually sent in the request
     updated_fields = prompt_data.model_dump(exclude_unset=True)
-    
-    # Step 1: Validate collection if it's being updated
+
+    # Validate collection if it's being updated
     if 'collection_id' in updated_fields:
         collection = storage.get_collection(updated_fields['collection_id'])
         if not collection:
             raise HTTPException(status_code=400, detail="Collection not found")
 
-    # Step 2: Update prompt with validated fields
+    # Merge existing fields with updated fields
     updated_prompt = Prompt(
         id=existing.id,
         title=updated_fields.get('title', existing.title),
         content=updated_fields.get('content', existing.content),
         description=updated_fields.get('description', existing.description),
         collection_id=updated_fields.get('collection_id', existing.collection_id),
+        tags=updated_fields.get('tags', existing.tags),
         created_at=existing.created_at,
-        updated_at=get_current_time()  # Use the current time for updates
+        updated_at=get_current_time()
     )
-    
+
     return storage.update_prompt(prompt_id, updated_prompt)
 
 
@@ -289,10 +284,10 @@ def get_collection(collection_id: str):
         raise HTTPException(status_code=404, detail="Collection not found")
     return collection
 
+
 @app.post("/collections", response_model=Collection, status_code=201)
 def create_collection(collection_data: CollectionCreate):
-    """
-    Create a new collection.
+    """Create a new collection.
 
     Args:
         collection_data (CollectionCreate): The data required to create a new collection.
@@ -311,8 +306,7 @@ def create_collection(collection_data: CollectionCreate):
 
 @app.delete("/collections/{collection_id}", status_code=204)
 def delete_collection(collection_id: str):
-    """
-    Delete a collection by its ID and handle related prompts.
+    """Delete a collection by its ID and handle related prompts.
 
     Args:
         collection_id (str): The ID of the collection to delete.
@@ -323,17 +317,15 @@ def delete_collection(collection_id: str):
     Raises:
         HTTPException: If the collection is not found, raises a 404 error.
     """
-    # Retrieve the collection to ensure it exists
     if not storage.get_collection(collection_id):
         raise HTTPException(status_code=404, detail="Collection not found")
-    
-    # Get all prompts and delete those with the specified collection_id
+
+    # Delete all prompts belonging to this collection
     prompts = storage.get_all_prompts()
     for prompt in prompts:
         if prompt.collection_id == collection_id:
             storage.delete_prompt(prompt.id)
 
-    # Delete the collection after its prompts are handled
     storage.delete_collection(collection_id)
 
     return None
